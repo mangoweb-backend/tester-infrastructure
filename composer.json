@@ -1,5 +1,5 @@
 {
-	"name": "mangoweb/presenter-tester",
+	"name": "mangoweb/tester-infrastructure",
 	"license": "MIT",
 	"require": {
 		"php": "~7.1",
