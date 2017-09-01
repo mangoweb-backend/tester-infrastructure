@@ -6,7 +6,7 @@ use Mangoweb\MailTester\MailTester;
 use Mangoweb\MailTester\TestMailer;
 use Mangoweb\Tester\DatabaseCreator\Bridges\NetteDI\DatabaseCreatorExtension;
 use Mangoweb\Tester\DatabaseCreator\DatabaseCreator;
-use Mangoweb\Tester\DatabaseCreator\DatabaseNameResolver;
+use Mangoweb\Tester\DatabaseCreator\IDatabaseNameResolver;
 use Mangoweb\Tester\Infrastructure\Bridges\Database\DatabaseCreatorHook;
 use Mangoweb\Tester\Infrastructure\Bridges\MailTester\MailTesterContainerHook;
 use Mangoweb\Tester\Infrastructure\Bridges\Mockery\MockeryContainerHook;
@@ -164,7 +164,7 @@ class MangoTesterExtension extends CompilerExtension
 		$args['config'] = new Statement('array_merge(?, ?)', [
 			$args['config'],
 			[
-				'database' => new Statement('@' . DatabaseNameResolver::class . '::getDatabaseName'),
+				'database' => new Statement('@' . IDatabaseNameResolver::class . '::getDatabaseName'),
 			],
 		]);
 		$def->setArguments($args);
