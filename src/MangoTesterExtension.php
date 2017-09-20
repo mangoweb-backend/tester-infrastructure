@@ -9,6 +9,7 @@ use Mangoweb\Tester\DatabaseCreator\DatabaseCreator;
 use Mangoweb\Tester\DatabaseCreator\IDatabaseNameResolver;
 use Mangoweb\Tester\Infrastructure\Bridges\Database\DatabaseCreatorHook;
 use Mangoweb\Tester\Infrastructure\Bridges\MailTester\MailTesterContainerHook;
+use Mangoweb\Tester\Infrastructure\Bridges\MailTester\MailTesterTestCaseListener;
 use Mangoweb\Tester\Infrastructure\Bridges\Mockery\MockeryContainerHook;
 use Mangoweb\Tester\Infrastructure\Bridges\NextrasDbal\NextrasDbalHook;
 use Mangoweb\Tester\Infrastructure\Bridges\PresenterTester\PresenterTesterTestCaseListener;
@@ -191,6 +192,8 @@ class MangoTesterExtension extends CompilerExtension
 		$builder->addDefinition($this->prefix('mailTesterContainerHook'))
 			->setClass(MailTesterContainerHook::class)
 			->addTag(self::TAG_HOOK);
+		$builder->addDefinition($this->prefix('mailTesterTestCaseListener'))
+			->setClass(MailTesterTestCaseListener::class);
 		$this->requireService(TestMailer::class);
 	}
 
