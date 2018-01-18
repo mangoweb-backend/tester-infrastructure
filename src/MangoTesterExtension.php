@@ -8,6 +8,8 @@ use Mangoweb\Tester\DatabaseCreator\Bridges\NetteDI\DatabaseCreatorExtension;
 use Mangoweb\Tester\DatabaseCreator\DatabaseCreator;
 use Mangoweb\Tester\DatabaseCreator\IDatabaseNameResolver;
 use Mangoweb\Tester\Infrastructure\Bridges\Database\DatabaseCreatorHook;
+use Mangoweb\Tester\Infrastructure\Bridges\LogMailer\LogTesterContainerHook;
+use Mangoweb\Tester\Infrastructure\Bridges\LogTester\LogTesterTestCaseListener;
 use Mangoweb\Tester\Infrastructure\Bridges\MailTester\MailTesterContainerHook;
 use Mangoweb\Tester\Infrastructure\Bridges\MailTester\MailTesterTestCaseListener;
 use Mangoweb\Tester\Infrastructure\Bridges\Mockery\MockeryContainerHook;
@@ -15,6 +17,8 @@ use Mangoweb\Tester\Infrastructure\Bridges\NextrasDbal\NextrasDbalHook;
 use Mangoweb\Tester\Infrastructure\Bridges\PresenterTester\PresenterTesterTestCaseListener;
 use Mangoweb\Tester\Infrastructure\Container\AppContainerFactory;
 use Mangoweb\Tester\Infrastructure\Mocks\MocksContainerHook;
+use Mangoweb\Tester\LogTester\LogTester;
+use Mangoweb\Tester\LogTester\TestLogger;
 use Mangoweb\Tester\PresenterTester\PresenterTester;
 use Nette;
 use Nette\Application\IPresenterFactory;
@@ -40,6 +44,7 @@ class MangoTesterExtension extends CompilerExtension
 		'hooks' => [],
 		'require' => [],
 		'presenterTester' => FALSE,
+		'logTester' => FALSE,
 		'mailTester' => FALSE,
 		'databaseCreator' => FALSE,
 		'nextrasDbal' => FALSE,
@@ -50,6 +55,7 @@ class MangoTesterExtension extends CompilerExtension
 	public function __construct()
 	{
 		$this->defaults['presenterTester'] = class_exists(PresenterTester::class);
+		$this->defaults['logTester'] = class_exists(LogTester::class);
 		$this->defaults['mailTester'] = class_exists(MailTester::class);
 		$this->defaults['databaseCreator'] = class_exists(DatabaseCreator::class);
 		$this->defaults['nextrasDbal'] = class_exists(Connection::class);
@@ -92,6 +98,11 @@ class MangoTesterExtension extends CompilerExtension
 		if ($config['presenterTester'] !== FALSE) {
 			$this->setupPresenterTester($config);
 		}
+
+		if ($config['logTester'] !== FALSE) {
+			$this->setupLogTester();
+		}
+
 		if ($config['mailTester'] !== FALSE) {
 			$this->setupMailTester();
 		}
@@ -103,6 +114,7 @@ class MangoTesterExtension extends CompilerExtension
 		if ($config['nextrasDbal'] !== FALSE) {
 			$this->setupNextrasDbal();
 		}
+
 		if ($config['mockery'] !== FALSE) {
 			$builder->addDefinition($this->prefix('mockeryContainerHook'))
 				->setClass(MockeryContainerHook::class)
@@ -181,6 +193,20 @@ class MangoTesterExtension extends CompilerExtension
 		$builder->addDefinition($this->prefix('createDatabaseHook'))
 			->setClass(DatabaseCreatorHook::class)
 			->addTag(self::TAG_HOOK);
+	}
+
+
+	protected function setupLogTester(): void
+	{
+		$builder = $this->getContainerBuilder();
+		$builder->addDefinition($this->prefix('logTester'))
+			->setClass(LogTester::class);
+		$builder->addDefinition($this->prefix('logTesterContainerHook'))
+			->setClass(LogTesterContainerHook::class)
+			->addTag(self::TAG_HOOK);
+		$builder->addDefinition($this->prefix('logTesterTestCaseListener'))
+			->setClass(LogTesterTestCaseListener::class);
+		$this->requireService(TestLogger::class);
 	}
 
 
