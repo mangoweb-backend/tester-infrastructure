@@ -2,6 +2,7 @@
 
 namespace Mangoweb\Tester\Infrastructure;
 
+use MangoShopTests\NextrasDbalServiceHelpers;
 use Mangoweb\MailTester\MailTester;
 use Mangoweb\MailTester\TestMailer;
 use Mangoweb\Tester\DatabaseCreator\Bridges\NetteDI\DatabaseCreatorExtension;
@@ -32,6 +33,7 @@ use Nette\Loaders\RobotLoader;
 use Nette\Security\User;
 use Nette\Utils\Validators;
 use Nextras\Dbal\Connection;
+use Nextras\Dbal\IConnection;
 
 
 class MangoTesterExtension extends CompilerExtension
@@ -170,18 +172,10 @@ class MangoTesterExtension extends CompilerExtension
 			->setClass(NextrasDbalHook::class)
 			->addTag(self::TAG_HOOK);
 
-		$def = $builder->getDefinitionByType(Connection::class);
-		$factory = $def->getFactory();
-		assert($factory !== NULL);
-		$args = $factory->arguments;
-		$args['config'] = new Statement('array_merge(?, ?)', [
-			$args['config'],
-			[
-				'database' => new Statement('@' . IDatabaseNameResolver::class . '::getDatabaseName'),
-			],
-		]);
-		$def->setArguments($args);
-		$def->addSetup(['@' . DatabaseCreator::class, 'createTestDatabase']);
+		$def = $builder->getDefinitionByType(IConnection::class);
+		if (!in_array(self::TAG_REQUIRE, $def->getTags())) {
+			NextrasDbalServiceHelpers::modifyConnectionDefinition($def);
+		}
 	}
 
 
