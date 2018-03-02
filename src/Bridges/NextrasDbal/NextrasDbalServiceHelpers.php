@@ -3,7 +3,6 @@
 namespace MangoShopTests;
 
 use Mangoweb\Tester\DatabaseCreator\DatabaseCreator;
-use Mangoweb\Tester\DatabaseCreator\IDatabaseNameResolver;
 use Nette\DI\ServiceDefinition;
 use Nette\DI\Statement;
 use Nette\StaticClass;
@@ -20,10 +19,10 @@ class NextrasDbalServiceHelpers
 		$args['config'] = new Statement('array_merge(?, ?)', [
 			$args['config'],
 			[
-				'database' => new Statement('@databaseCreator::getDatabaseName'),
+				'database' => new Statement('@' . DatabaseCreator::class . '::getDatabaseName'),
 			],
 		]);
 		$definition->setArguments($args);
-		$definition->addSetup(['@databaseCreator', 'createTestDatabase']);
+		$definition->addSetup(['@' . DatabaseCreator::class, 'createTestDatabase']);
 	}
 }

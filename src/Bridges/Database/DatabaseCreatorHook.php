@@ -32,8 +32,7 @@ class DatabaseCreatorHook implements IAppContainerHook
 	{
 		$builder->addDefinition('databaseCreator')
 			->setClass(DatabaseCreator::class)
-			->setDynamic()
-			->setAutowired(FALSE);
+			->setDynamic();
 		$builder->prepareClassList();
 	}
 
