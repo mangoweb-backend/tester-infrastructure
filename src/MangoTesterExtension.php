@@ -32,7 +32,6 @@ use Nette\Http\Session;
 use Nette\Loaders\RobotLoader;
 use Nette\Security\User;
 use Nette\Utils\Validators;
-use Nextras\Dbal\Connection;
 use Nextras\Dbal\IConnection;
 
 
@@ -60,7 +59,7 @@ class MangoTesterExtension extends CompilerExtension
 		$this->defaults['logTester'] = class_exists(LogTester::class);
 		$this->defaults['mailTester'] = class_exists(MailTester::class);
 		$this->defaults['databaseCreator'] = class_exists(DatabaseCreator::class);
-		$this->defaults['nextrasDbal'] = class_exists(Connection::class);
+		$this->defaults['nextrasDbal'] = class_exists(IConnection::class);
 		$this->defaults['mockery'] = class_exists(\Mockery::class);
 	}
 
@@ -172,8 +171,9 @@ class MangoTesterExtension extends CompilerExtension
 			->setClass(NextrasDbalHook::class)
 			->addTag(self::TAG_HOOK);
 
-		$def = $builder->getDefinitionByType(IConnection::class);
-		if (!in_array(self::TAG_REQUIRE, $def->getTags())) {
+		$serviceName = $builder->getByType(IConnection::class);
+		$def = $serviceName ? $builder->getDefinition($serviceName) : NULL;
+		if ($def && !in_array(self::TAG_REQUIRE, $def->getTags())) {
 			NextrasDbalServiceHelpers::modifyConnectionDefinition($def);
 		}
 	}
