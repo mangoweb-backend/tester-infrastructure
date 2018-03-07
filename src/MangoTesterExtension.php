@@ -59,7 +59,7 @@ class MangoTesterExtension extends CompilerExtension
 		$this->defaults['logTester'] = class_exists(LogTester::class);
 		$this->defaults['mailTester'] = class_exists(MailTester::class);
 		$this->defaults['databaseCreator'] = class_exists(DatabaseCreator::class);
-		$this->defaults['nextrasDbal'] = class_exists(IConnection::class);
+		$this->defaults['nextrasDbal'] = interface_exists(IConnection::class);
 		$this->defaults['mockery'] = class_exists(\Mockery::class);
 	}
 
