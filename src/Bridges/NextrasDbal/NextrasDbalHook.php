@@ -7,12 +7,17 @@ use Mangoweb\Tester\Infrastructure\Container\IAppContainerHook;
 use Nette\Configurator;
 use Nette\DI\Container;
 use Nette\DI\ContainerBuilder;
-use Nette\DI\Statement;
 use Nextras\Dbal\Connection;
 
 
 class NextrasDbalHook implements IAppContainerHook
 {
+	public function getHash(): string
+	{
+		return __CLASS__;
+	}
+
+
 	public function onConfigure(Configurator $configurator): void
 	{
 	}

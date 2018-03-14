@@ -9,13 +9,11 @@ use Nette\DI\ContainerBuilder;
 
 interface IAppContainerHook
 {
+	public function getHash(): string;
 
-	public function onConfigure(Configurator $configurator): void;
+	public function onConfigure(Configurator $appConfigurator): void;
 
+	public function onCompile(ContainerBuilder $appContainerBuilder): void;
 
-	public function onCompile(ContainerBuilder $builder): void;
-
-
-	public function onCreate(Container $applicationContainer): void;
-
+	public function onCreate(Container $appContainer): void;
 }

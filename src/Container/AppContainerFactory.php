@@ -23,43 +23,39 @@ class AppContainerFactory
 
 	public function create(Container $testContainer, ?IAppContainerHook $testCaseHook): Container
 	{
-		$configurator = $this->appConfiguratorFactory->create($testContainer);
+		$hook = $this->getHook($testContainer, $testCaseHook);
 
-		$hook = $this->getHook($testContainer);
-		if ($testCaseHook) {
-			$hook = new AppContainerHookList([$hook, $testCaseHook]);
-		}
-		$this->setupConfigurator($testContainer, $configurator, $hook);
+		$appConfigurator = $this->appConfiguratorFactory->create($testContainer);
+		$this->setupConfigurator($testContainer, $appConfigurator, $hook);
 
-		$appContainer = $configurator->createContainer();
+		$appContainer = $appConfigurator->createContainer();
 		$hook->onCreate($appContainer);
-		assert($appContainer instanceof Container);
 
 		return $appContainer;
 	}
 
 
-	protected function setupConfigurator(Container $testContainer, Configurator $configurator, IAppContainerHook $hook): void
+	protected function setupConfigurator(Container $testContainer, Configurator $appConfigurator, IAppContainerHook $hook): void
 	{
-		$configurator->addParameters([
-			'hooksHash' => md5(serialize(get_class($hook))),
-		]);
-		$hook->onConfigure($configurator);
-		$configurator->onCompile[] = function ($configurator, Compiler $compiler) use ($hook) {
+		$hook->onConfigure($appConfigurator);
+
+		$appConfigurator->onCompile[] = function (Configurator $configurator, Compiler $compiler) use ($hook): void {
 			$compilerExtension = new CompilerHookExtension();
-			$compilerExtension->onBeforeCompile[] = function (ContainerBuilder $builder) use ($hook) {
+			$compilerExtension->onBeforeCompile[] = function (ContainerBuilder $builder) use ($hook): void {
 				$hook->onCompile($builder);
 			};
-			$compiler->addExtension('tests.beforeCompile', $compilerExtension);
+
+			$compiler->addExtension('mango.tester.beforeCompile', $compilerExtension);
 		};
 
-		$configurator->addParameters([
+		$appConfigurator->addParameters([
+			'hookHash' => $hook->getHash(),
 			'testContainerParameters' => $testContainer->getParameters(),
 		]);
 	}
 
 
-	protected function getHook(Container $testContainer): IAppContainerHook
+	protected function getHook(Container $testContainer, ?IAppContainerHook $testCaseHook): IAppContainerHook
 	{
 		$hooks = [];
 
@@ -68,6 +64,11 @@ class AppContainerFactory
 			assert($hook instanceof IAppContainerHook);
 			$hooks[] = $hook;
 		}
+
+		if ($testCaseHook !== null) {
+			$hooks[] = $testCaseHook;
+		}
+
 		return new AppContainerHookList($hooks);
 	}
 }

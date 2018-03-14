@@ -24,6 +24,12 @@ class MockeryContainerHook implements IAppContainerHook
 	}
 
 
+	public function getHash(): string
+	{
+		return __CLASS__;
+	}
+
+
 	public function onConfigure(Configurator $configurator): void
 	{
 

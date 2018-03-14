@@ -7,10 +7,16 @@ use Mangoweb\Tester\Infrastructure\Container\IAppContainerHook;
 use Nette\Configurator;
 use Nette\DI\Container;
 use Nette\DI\ContainerBuilder;
+use Nette\Mail\IMailer;
 
 
 class MailTesterContainerHook implements IAppContainerHook
 {
+	public function getHash(): string
+	{
+		return __CLASS__;
+	}
+
 
 	public function onConfigure(Configurator $configurator): void
 	{
