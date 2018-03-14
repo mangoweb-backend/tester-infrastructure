@@ -30,5 +30,4 @@ class MailTesterContainerHook implements IAppContainerHook
 	{
 
 	}
-
 }

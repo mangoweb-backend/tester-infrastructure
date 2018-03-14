@@ -11,7 +11,6 @@ use Nette\DI\ContainerBuilder;
 
 class AppContainerFactory
 {
-
 	/** @var IAppConfiguratorFactory */
 	private $appConfiguratorFactory;
 
@@ -63,6 +62,7 @@ class AppContainerFactory
 	protected function getHook(Container $testContainer): IAppContainerHook
 	{
 		$hooks = [];
+
 		foreach ($testContainer->findByTag(MangoTesterExtension::TAG_HOOK) as $hookName => $_) {
 			$hook = $testContainer->getService($hookName);
 			assert($hook instanceof IAppContainerHook);
@@ -70,5 +70,4 @@ class AppContainerFactory
 		}
 		return new AppContainerHookList($hooks);
 	}
-
 }

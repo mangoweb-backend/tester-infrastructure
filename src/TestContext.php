@@ -5,7 +5,6 @@ namespace Mangoweb\Tester\Infrastructure;
 
 class TestContext
 {
-
 	/** @var string */
 	private $testCaseClass;
 
@@ -30,5 +29,4 @@ class TestContext
 	{
 		return $this->testMethod;
 	}
-
 }

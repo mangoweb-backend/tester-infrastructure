@@ -18,7 +18,7 @@ class Session extends Nette\Http\Session
 	private $exists = FALSE;
 
 	/** @var string */
-	private $id = NULL;
+	private $id;
 
 
 	public function __construct()

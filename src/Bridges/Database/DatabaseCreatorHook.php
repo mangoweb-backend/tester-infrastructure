@@ -11,7 +11,6 @@ use Nette\DI\ContainerBuilder;
 
 class DatabaseCreatorHook implements IAppContainerHook
 {
-
 	/** @var DatabaseCreator */
 	private $databaseCreator;
 
@@ -41,5 +40,4 @@ class DatabaseCreatorHook implements IAppContainerHook
 	{
 		$applicationContainer->addService('databaseCreator', $this->databaseCreator);
 	}
-
 }

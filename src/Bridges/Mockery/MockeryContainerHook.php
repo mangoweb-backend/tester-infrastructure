@@ -56,5 +56,4 @@ class MockeryContainerHook implements IAppContainerHook
 		}
 
 	}
-
 }

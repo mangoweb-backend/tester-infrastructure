@@ -2,13 +2,9 @@
 
 namespace Mangoweb\Tester\Infrastructure;
 
-
 interface ITestCaseListener
 {
-
 	public function setUp(TestCase $testCase): void;
 
-
 	public function tearDown(TestCase $testCase): void;
-
 }

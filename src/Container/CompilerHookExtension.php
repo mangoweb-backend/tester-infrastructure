@@ -7,7 +7,6 @@ use Nette\DI\CompilerExtension;
 
 class CompilerHookExtension extends CompilerExtension
 {
-
 	/** @var callable[] */
 	public $onBeforeCompile = [];
 
@@ -18,5 +17,4 @@ class CompilerHookExtension extends CompilerExtension
 			call_user_func($fn, $this->getContainerBuilder());
 		}
 	}
-
 }

@@ -8,7 +8,5 @@ use Nette\DI\Container;
 
 interface IAppConfiguratorFactory
 {
-
 	public function create(Container $testContainer): Configurator;
-
 }
