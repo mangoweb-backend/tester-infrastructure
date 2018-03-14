@@ -2,15 +2,13 @@
 
 namespace Mangoweb\Tester\Infrastructure\Bridges\Mockery;
 
-use Mangoweb\Tester\Infrastructure\Container\IAppContainerHook;
+use Mangoweb\Tester\Infrastructure\Container\AppContainerHook;
 use Mangoweb\Tester\Infrastructure\TestContext;
 use Mockery\MockInterface;
-use Nette\Configurator;
 use Nette\DI\Container;
-use Nette\DI\ContainerBuilder;
 use Nette\Utils\Strings;
 
-class MockeryContainerHook implements IAppContainerHook
+class MockeryContainerHook extends AppContainerHook
 {
 
 	/** @var TestContext */
@@ -20,23 +18,6 @@ class MockeryContainerHook implements IAppContainerHook
 	public function __construct(TestContext $testContext)
 	{
 		$this->testContext = $testContext;
-	}
-
-
-	public function getHash(): string
-	{
-		return __CLASS__;
-	}
-
-
-	public function onConfigure(Configurator $configurator): void
-	{
-
-	}
-
-
-	public function onCompile(ContainerBuilder $builder): void
-	{
 	}
 
 

@@ -3,13 +3,12 @@
 namespace Mangoweb\Tester\Infrastructure\Bridges\Database;
 
 use Mangoweb\Tester\DatabaseCreator\DatabaseCreator;
-use Mangoweb\Tester\Infrastructure\Container\IAppContainerHook;
-use Nette\Configurator;
+use Mangoweb\Tester\Infrastructure\Container\AppContainerHook;
 use Nette\DI\Container;
 use Nette\DI\ContainerBuilder;
 
 
-class DatabaseCreatorHook implements IAppContainerHook
+class DatabaseCreatorHook extends AppContainerHook
 {
 	/** @var DatabaseCreator */
 	private $databaseCreator;
@@ -18,18 +17,6 @@ class DatabaseCreatorHook implements IAppContainerHook
 	public function __construct(DatabaseCreator $databaseCreator)
 	{
 		$this->databaseCreator = $databaseCreator;
-	}
-
-
-	public function getHash(): string
-	{
-		return __CLASS__;
-	}
-
-
-	public function onConfigure(Configurator $configurator): void
-	{
-
 	}
 
 
