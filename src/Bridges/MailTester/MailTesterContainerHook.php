@@ -26,7 +26,7 @@ class MailTesterContainerHook implements IAppContainerHook
 
 	public function onCompile(ContainerBuilder $builder): void
 	{
-		$builder->getDefinition('mail.mailer')
+		$builder->getDefinitionByType(IMailer::class)
 			->setClass(TestMailer::class)
 			->setFactory(TestMailer::class);
 	}

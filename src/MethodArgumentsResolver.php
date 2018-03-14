@@ -20,12 +20,12 @@ class MethodArgumentsResolver
 
 	/**
 	 * Autowires parametrics arguments by annotation with the following syntax:
-	 * @param string %any.param.name%
+	 *   (@)param string %any.param.name%
 	 *              The string keyword is required mostly for PhpStorm compatibility.
 	 *              Note that only positional arguments are not supported.
 	 *
-	 * Event though variable name is also allowed in the annotation, such as
-	 * @param $name %any.param.name%
+	 * Even though variable name is also allowed in the annotation, such as
+	 *   (@)param $name %any.param.name%
 	 *              the $name is not used.
 	 *
 	 * @return mixed[]

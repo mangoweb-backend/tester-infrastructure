@@ -5,9 +5,7 @@ namespace Mangoweb\Tester\Infrastructure;
 use MangoShopTests\NextrasDbalServiceHelpers;
 use Mangoweb\MailTester\MailTester;
 use Mangoweb\MailTester\TestMailer;
-use Mangoweb\Tester\DatabaseCreator\Bridges\NetteDI\DatabaseCreatorExtension;
 use Mangoweb\Tester\DatabaseCreator\DatabaseCreator;
-use Mangoweb\Tester\DatabaseCreator\IDatabaseNameResolver;
 use Mangoweb\Tester\Infrastructure\Bridges\Database\DatabaseCreatorHook;
 use Mangoweb\Tester\Infrastructure\Bridges\LogMailer\LogTesterContainerHook;
 use Mangoweb\Tester\Infrastructure\Bridges\LogTester\LogTesterTestCaseListener;
@@ -29,9 +27,9 @@ use Nette\DI\Container;
 use Nette\DI\Statement;
 use Nette\Http\IRequest;
 use Nette\Http\Session;
-use Nette\Loaders\RobotLoader;
 use Nette\Security\User;
 use Nette\Utils\Validators;
+use Nextras\Dbal\Connection;
 use Nextras\Dbal\IConnection;
 
 
@@ -59,7 +57,7 @@ class MangoTesterExtension extends CompilerExtension
 		$this->defaults['logTester'] = class_exists(LogTester::class);
 		$this->defaults['mailTester'] = class_exists(MailTester::class);
 		$this->defaults['databaseCreator'] = class_exists(DatabaseCreator::class);
-		$this->defaults['nextrasDbal'] = interface_exists(IConnection::class);
+		$this->defaults['nextrasDbal'] = class_exists(Connection::class);
 		$this->defaults['mockery'] = class_exists(\Mockery::class);
 	}
 
@@ -85,13 +83,9 @@ class MangoTesterExtension extends CompilerExtension
 		$builder->addDefinition($this->prefix('containerFactory'))
 			->setClass(AppContainerFactory::class);
 
-		$builder->addDefinition($this->prefix('robotLoader'))
-			->setClass(RobotLoader::class)
-			->setDynamic(TRUE);
-
 		$builder->addDefinition($this->prefix('methodArgumentResolver'))
 			->setClass(MethodArgumentsResolver::class);
-		$builder->addDefinition($this->prefix("testContext"))
+		$builder->addDefinition($this->prefix('testContext'))
 			->setClass(TestContext::class)
 			->setDynamic(TRUE);
 
@@ -173,7 +167,7 @@ class MangoTesterExtension extends CompilerExtension
 
 		$serviceName = $builder->getByType(IConnection::class);
 		$def = $serviceName ? $builder->getDefinition($serviceName) : NULL;
-		if ($def && !in_array(self::TAG_REQUIRE, $def->getTags())) {
+		if ($def && !isset($def->getTags()[self::TAG_REQUIRE])) {
 			NextrasDbalServiceHelpers::modifyConnectionDefinition($def);
 		}
 	}
@@ -182,8 +176,6 @@ class MangoTesterExtension extends CompilerExtension
 	protected function setupDatabaseCreator(): void
 	{
 		$builder = $this->getContainerBuilder();
-		$dbCreatorExtension = $this->compiler->getExtensions(DatabaseCreatorExtension::class);
-		assert(count($dbCreatorExtension) === 1, 'Register DatabaseCreator extension first');
 		$builder->addDefinition($this->prefix('createDatabaseHook'))
 			->setClass(DatabaseCreatorHook::class)
 			->addTag(self::TAG_HOOK);
