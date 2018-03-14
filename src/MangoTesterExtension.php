@@ -3,12 +3,8 @@
 namespace Mangoweb\Tester\Infrastructure;
 
 use MangoShopTests\NextrasDbalServiceHelpers;
-use Mangoweb\MailTester\MailTester;
-use Mangoweb\MailTester\TestMailer;
 use Mangoweb\Tester\DatabaseCreator\DatabaseCreator;
 use Mangoweb\Tester\Infrastructure\Bridges\Database\DatabaseCreatorHook;
-use Mangoweb\Tester\Infrastructure\Bridges\MailTester\MailTesterContainerHook;
-use Mangoweb\Tester\Infrastructure\Bridges\MailTester\MailTesterTestCaseListener;
 use Mangoweb\Tester\Infrastructure\Bridges\Mockery\MockeryContainerHook;
 use Mangoweb\Tester\Infrastructure\Bridges\NextrasDbal\NextrasDbalHook;
 use Mangoweb\Tester\Infrastructure\Bridges\PresenterTester\PresenterTesterTestCaseListener;
@@ -39,7 +35,6 @@ class MangoTesterExtension extends CompilerExtension
 		'hooks' => [],
 		'require' => [],
 		'presenterTester' => FALSE,
-		'mailTester' => FALSE,
 		'databaseCreator' => FALSE,
 		'nextrasDbal' => FALSE,
 		'mockery' => FALSE,
@@ -49,7 +44,6 @@ class MangoTesterExtension extends CompilerExtension
 	public function __construct()
 	{
 		$this->defaults['presenterTester'] = class_exists(PresenterTester::class);
-		$this->defaults['mailTester'] = class_exists(MailTester::class);
 		$this->defaults['databaseCreator'] = class_exists(DatabaseCreator::class);
 		$this->defaults['nextrasDbal'] = class_exists(Connection::class);
 		$this->defaults['mockery'] = class_exists(\Mockery::class);
@@ -86,10 +80,6 @@ class MangoTesterExtension extends CompilerExtension
 
 		if ($config['presenterTester'] !== FALSE) {
 			$this->setupPresenterTester($config);
-		}
-
-		if ($config['mailTester'] !== FALSE) {
-			$this->setupMailTester();
 		}
 
 		if ($config['databaseCreator'] !== FALSE) {
@@ -169,20 +159,6 @@ class MangoTesterExtension extends CompilerExtension
 		$builder->addDefinition($this->prefix('createDatabaseHook'))
 			->setClass(DatabaseCreatorHook::class)
 			->addTag(self::TAG_HOOK);
-	}
-
-
-	protected function setupMailTester(): void
-	{
-		$builder = $this->getContainerBuilder();
-		$builder->addDefinition($this->prefix('mailTester'))
-			->setClass(MailTester::class);
-		$builder->addDefinition($this->prefix('mailTesterContainerHook'))
-			->setClass(MailTesterContainerHook::class)
-			->addTag(self::TAG_HOOK);
-		$builder->addDefinition($this->prefix('mailTesterTestCaseListener'))
-			->setClass(MailTesterTestCaseListener::class);
-		$this->requireService(TestMailer::class);
 	}
 
 
