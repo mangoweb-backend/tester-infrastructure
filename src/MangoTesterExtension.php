@@ -7,19 +7,11 @@ use Mangoweb\Tester\DatabaseCreator\DatabaseCreator;
 use Mangoweb\Tester\Infrastructure\Bridges\Database\DatabaseCreatorHook;
 use Mangoweb\Tester\Infrastructure\Bridges\Mockery\MockeryContainerHook;
 use Mangoweb\Tester\Infrastructure\Bridges\NextrasDbal\NextrasDbalHook;
-use Mangoweb\Tester\Infrastructure\Bridges\PresenterTester\PresenterTesterTestCaseListener;
 use Mangoweb\Tester\Infrastructure\Container\AppContainerFactory;
-use Mangoweb\Tester\PresenterTester\PresenterTester;
 use Nette;
-use Nette\Application\IPresenterFactory;
-use Nette\Application\IRouter;
 use Nette\DI\CompilerExtension;
 use Nette\DI\Container;
 use Nette\DI\Statement;
-use Nette\Http\IRequest;
-use Nette\Http\Session;
-use Nette\Security\User;
-use Nette\Utils\Validators;
 use Nextras\Dbal\Connection;
 use Nextras\Dbal\IConnection;
 
@@ -30,10 +22,8 @@ class MangoTesterExtension extends CompilerExtension
 	public const TAG_HOOK = 'mango.tester.hook';
 
 	public $defaults = [
-		'baseUrl' => 'https://test.dev',
 		'hooks' => [],
 		'require' => [],
-		'presenterTester' => FALSE,
 		'databaseCreator' => FALSE,
 		'nextrasDbal' => FALSE,
 		'mockery' => FALSE,
@@ -42,7 +32,6 @@ class MangoTesterExtension extends CompilerExtension
 
 	public function __construct()
 	{
-		$this->defaults['presenterTester'] = class_exists(PresenterTester::class);
 		$this->defaults['databaseCreator'] = class_exists(DatabaseCreator::class);
 		$this->defaults['nextrasDbal'] = class_exists(Connection::class);
 		$this->defaults['mockery'] = class_exists(\Mockery::class);
@@ -70,11 +59,6 @@ class MangoTesterExtension extends CompilerExtension
 		$builder->addDefinition($this->prefix('testContext'))
 			->setClass(TestContext::class)
 			->setDynamic(TRUE);
-
-
-		if ($config['presenterTester'] !== FALSE) {
-			$this->setupPresenterTester($config);
-		}
 
 		if ($config['databaseCreator'] !== FALSE) {
 			$this->setupDatabaseCreator();
@@ -153,35 +137,6 @@ class MangoTesterExtension extends CompilerExtension
 		$builder->addDefinition($this->prefix('createDatabaseHook'))
 			->setClass(DatabaseCreatorHook::class)
 			->addTag(self::TAG_HOOK);
-	}
-
-
-	protected function setupPresenterTester(array $config): void
-	{
-		$builder = $this->getContainerBuilder();
-		if ($config['presenterTester'] === TRUE) {
-			$config['presenterTester'] = [];
-		}
-		Validators::assert($config['presenterTester'], 'array');
-		$config['presenterTester'] += [
-			'identityFactory' => NULL,
-		];
-		$builder->addDefinition($this->prefix('presenterTester'))
-			->setClass(PresenterTester::class)
-			->setArguments(['baseUrl' => $config['baseUrl'], 'identityFactory' => $config['presenterTester']['identityFactory']])
-			->addSetup(new Statement('?->? = ?',
-				[
-					$this->prefix('@presenterTesterTearDown'),
-					'presenterTester',
-					'@self',
-				]));
-		$builder->addDefinition($this->prefix('presenterTesterTearDown'))
-			->setClass(PresenterTesterTestCaseListener::class);
-		$this->requireService(IPresenterFactory::class);
-		$this->requireService(User::class);
-		$this->requireService(IRouter::class);
-		$this->requireService(IRequest::class);
-		$this->requireService(Session::class);
 	}
 
 

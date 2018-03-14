@@ -9,7 +9,6 @@
 	},
 	"require-dev": {
 		"nette/utils": "~2.4",
-		"nette/http": "~2.4",
 		"nette/reflection": "^2.4"
 	},
 	"autoload": {
