@@ -8,7 +8,6 @@ use Mockery\MockInterface;
 use Nette\Configurator;
 use Nette\DI\Container;
 use Nette\DI\ContainerBuilder;
-use Nette\Reflection\AnnotationsParser;
 use Nette\Utils\Strings;
 
 class MockeryContainerHook implements IAppContainerHook
@@ -53,8 +52,8 @@ class MockeryContainerHook implements IAppContainerHook
 				continue;
 			}
 			[$requiredType, $mockeryType] = $types;
-			$requiredType = AnnotationsParser::expandClassName($requiredType, $rc);
-			$mockeryType = AnnotationsParser::expandClassName($mockeryType, $rc);
+			$requiredType = \Nette\Utils\Reflection::expandClassName($requiredType, $rc);
+			$mockeryType = \Nette\Utils\Reflection::expandClassName($mockeryType, $rc);
 			if ($mockeryType !== MockInterface::class) {
 				continue;
 			}
