@@ -2,18 +2,12 @@
 
 namespace Mangoweb\Tester\Infrastructure;
 
-use MangoShopTests\NextrasDbalServiceHelpers;
-use Mangoweb\Tester\DatabaseCreator\DatabaseCreator;
-use Mangoweb\Tester\Infrastructure\Bridges\Database\DatabaseCreatorHook;
 use Mangoweb\Tester\Infrastructure\Bridges\Mockery\MockeryContainerHook;
-use Mangoweb\Tester\Infrastructure\Bridges\NextrasDbal\NextrasDbalHook;
 use Mangoweb\Tester\Infrastructure\Container\AppContainerFactory;
 use Nette;
 use Nette\DI\CompilerExtension;
 use Nette\DI\Container;
 use Nette\DI\Statement;
-use Nextras\Dbal\Connection;
-use Nextras\Dbal\IConnection;
 
 
 class MangoTesterExtension extends CompilerExtension
@@ -24,16 +18,12 @@ class MangoTesterExtension extends CompilerExtension
 	public $defaults = [
 		'hooks' => [],
 		'require' => [],
-		'databaseCreator' => FALSE,
-		'nextrasDbal' => FALSE,
 		'mockery' => FALSE,
 	];
 
 
 	public function __construct()
 	{
-		$this->defaults['databaseCreator'] = class_exists(DatabaseCreator::class);
-		$this->defaults['nextrasDbal'] = class_exists(Connection::class);
 		$this->defaults['mockery'] = class_exists(\Mockery::class);
 	}
 
@@ -59,14 +49,6 @@ class MangoTesterExtension extends CompilerExtension
 		$builder->addDefinition($this->prefix('testContext'))
 			->setClass(TestContext::class)
 			->setDynamic(TRUE);
-
-		if ($config['databaseCreator'] !== FALSE) {
-			$this->setupDatabaseCreator();
-		}
-
-		if ($config['nextrasDbal'] !== FALSE) {
-			$this->setupNextrasDbal();
-		}
 
 		if ($config['mockery'] !== FALSE) {
 			$builder->addDefinition($this->prefix('mockeryContainerHook'))
@@ -113,30 +95,6 @@ class MangoTesterExtension extends CompilerExtension
 		foreach ($requiredServices as $class) {
 			$this->requireService($class);
 		}
-	}
-
-
-	protected function setupNextrasDbal(): void
-	{
-		$builder = $this->getContainerBuilder();
-		$builder->addDefinition($this->prefix('nextrasDbalHook'))
-			->setClass(NextrasDbalHook::class)
-			->addTag(self::TAG_HOOK);
-
-		$serviceName = $builder->getByType(IConnection::class);
-		$def = $serviceName ? $builder->getDefinition($serviceName) : NULL;
-		if ($def && !isset($def->getTags()[self::TAG_REQUIRE])) {
-			NextrasDbalServiceHelpers::modifyConnectionDefinition($def);
-		}
-	}
-
-
-	protected function setupDatabaseCreator(): void
-	{
-		$builder = $this->getContainerBuilder();
-		$builder->addDefinition($this->prefix('createDatabaseHook'))
-			->setClass(DatabaseCreatorHook::class)
-			->addTag(self::TAG_HOOK);
 	}
 
 
