@@ -9,7 +9,6 @@ use Mangoweb\Tester\Infrastructure\Bridges\Mockery\MockeryContainerHook;
 use Mangoweb\Tester\Infrastructure\Bridges\NextrasDbal\NextrasDbalHook;
 use Mangoweb\Tester\Infrastructure\Bridges\PresenterTester\PresenterTesterTestCaseListener;
 use Mangoweb\Tester\Infrastructure\Container\AppContainerFactory;
-use Mangoweb\Tester\Infrastructure\Mocks\MocksContainerHook;
 use Mangoweb\Tester\PresenterTester\PresenterTester;
 use Nette;
 use Nette\Application\IPresenterFactory;
@@ -62,11 +61,6 @@ class MangoTesterExtension extends CompilerExtension
 			->setClass(Container::class)
 			->setAutowired(FALSE)
 			->setDynamic(TRUE);
-
-		$builder->addDefinition($this->prefix('mocksContainerHook'))
-			->setClass(MocksContainerHook::class)
-			->setArguments([$config['baseUrl']])
-			->addTag(self::TAG_HOOK);
 
 		$builder->addDefinition($this->prefix('containerFactory'))
 			->setClass(AppContainerFactory::class);
