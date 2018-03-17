@@ -145,6 +145,7 @@ class TestCase
 		try {
 			$this->applicationContainer->callInjects($this);
 
+			$this->executeSetupListeners();
 			$this->setUp();
 
 			$this->handleErrors = TRUE;
