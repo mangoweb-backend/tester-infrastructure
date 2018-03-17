@@ -100,12 +100,12 @@ class TestCase
 	}
 
 
-	protected function executeSetupListeners(): void
+	protected function executeSetupListeners(\ReflectionMethod $method): void
 	{
 		foreach ($this->testContainer->findByType(ITestCaseListener::class) as $serviceName) {
 			$service = $this->testContainer->getService($serviceName);
 			assert($service instanceof ITestCaseListener);
-			$service->setUp($this);
+			$service->setUp($this, $this->applicationContainer,$method);
 		}
 	}
 
@@ -118,12 +118,12 @@ class TestCase
 	}
 
 
-	protected function executeTearDownListeners(): void
+	protected function executeTearDownListeners(\ReflectionMethod $method): void
 	{
 		foreach ($this->testContainer->findByType(ITestCaseListener::class) as $serviceName) {
 			$service = $this->testContainer->getService($serviceName);
 			assert($service instanceof ITestCaseListener);
-			$service->tearDown($this);
+			$service->tearDown($this, $this->applicationContainer, $method);
 		}
 	}
 
@@ -145,7 +145,7 @@ class TestCase
 		try {
 			$this->applicationContainer->callInjects($this);
 
-			$this->executeSetupListeners();
+			$this->executeSetupListeners($method);
 			$this->setUp();
 
 			$this->handleErrors = TRUE;
@@ -159,7 +159,7 @@ class TestCase
 			$this->handleErrors = FALSE;
 
 			$this->tearDown();
-			$this->executeTearDownListeners();
+			$this->executeTearDownListeners($method);
 
 			return $result;
 		} catch (AssertException $e) {
