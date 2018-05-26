@@ -15,6 +15,7 @@ class DefaultAppConfiguratorFactory implements IAppConfiguratorFactory
 		'tempDir',
 		'appDir',
 		'wwwDir',
+		'consoleMode',
 	];
 
 	/** @var array */
@@ -22,6 +23,9 @@ class DefaultAppConfiguratorFactory implements IAppConfiguratorFactory
 
 	/** @var array */
 	private $copiedParameters;
+
+	/** @var bool */
+	private $defaultExtensionsOverride = true;
 
 
 	public function __construct(array $configFiles, array $copiedParameters = self::COPIED_PARAMETERS)
@@ -31,14 +35,22 @@ class DefaultAppConfiguratorFactory implements IAppConfiguratorFactory
 	}
 
 
+	public function disableDefaultExtensionsOverride(bool $disable = true): void
+	{
+		$this->defaultExtensionsOverride = !$disable;
+	}
+
+
 	public function create(Container $testContainer): Configurator
 	{
 		$params = $testContainer->getParameters();
 
 		$configurator = new Configurator;
-		$configurator->defaultExtensions = [
-			'extensions' => ExtensionsExtension::class,
-		];
+		if ($this->defaultExtensionsOverride) {
+			$configurator->defaultExtensions = [
+				'extensions' => ExtensionsExtension::class,
+			];
+		}
 
 		$configurator->setDebugMode(true);
 		$configurator->setTempDirectory($params['tempDir']);

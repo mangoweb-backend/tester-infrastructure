@@ -18,7 +18,8 @@ class MangoTesterExtension extends CompilerExtension
 	public $defaults = [
 		'hooks' => [],
 		'require' => [],
-		'mockery' => FALSE,
+		'appContainer' => [],
+		'mockery' => false,
 	];
 
 
@@ -34,12 +35,13 @@ class MangoTesterExtension extends CompilerExtension
 
 		$this->registerRequiredServices($config['require']);
 		$this->registerHooks($config['hooks']);
+		$this->registerAppConfiguratorFactory($config['appContainer']);
 
 		$builder = $this->getContainerBuilder();
 		$builder->addDefinition($this->prefix('appContainer'))
 			->setClass(Container::class)
-			->setAutowired(FALSE)
-			->setDynamic(TRUE);
+			->setAutowired(false)
+			->setDynamic(true);
 
 		$builder->addDefinition($this->prefix('containerFactory'))
 			->setClass(AppContainerFactory::class);
@@ -48,9 +50,9 @@ class MangoTesterExtension extends CompilerExtension
 			->setClass(MethodArgumentsResolver::class);
 		$builder->addDefinition($this->prefix('testContext'))
 			->setClass(TestContext::class)
-			->setDynamic(TRUE);
+			->setDynamic(true);
 
-		if ($config['mockery'] !== FALSE) {
+		if ($config['mockery'] !== false) {
 			$builder->addDefinition($this->prefix('mockeryContainerHook'))
 				->setClass(MockeryContainerHook::class)
 				->addTag(self::TAG_HOOK);
@@ -63,8 +65,8 @@ class MangoTesterExtension extends CompilerExtension
 		$builder = $this->getContainerBuilder();
 		foreach ($builder->findByTag(self::TAG_REQUIRE) as $service => $attrs) {
 			$def = $builder->getDefinition($service);
-			$def->setDynamic(FALSE);
-			if (is_string($attrs) && strpos($attrs, '\\') === FALSE) {
+			$def->setDynamic(false);
+			if (is_string($attrs) && strpos($attrs, '\\') === false) {
 				$def->setFactory(new Statement([$this->prefix('@appContainer'), 'getService'], [$attrs]));
 			} elseif (is_string($attrs)) {
 				$def->setFactory(new Statement([$this->prefix('@appContainer'), 'getByType'], [$attrs]));
@@ -104,8 +106,25 @@ class MangoTesterExtension extends CompilerExtension
 		$name = preg_replace('#\W+#', '_', $class);
 		$builder->addDefinition($this->prefix($name))
 			->setClass($class)
-			->setDynamic(TRUE)
+			->setDynamic(true)
 			->addTag(self::TAG_REQUIRE);
+	}
+
+
+	private function registerAppConfiguratorFactory(array $config)
+	{
+		if ($config === []) {
+			return;
+		}
+		$builder = $this->getContainerBuilder();
+		$def = $builder->addDefinition($this->prefix('appConfiguratorFactory'))
+			->setFactory(DefaultAppConfiguratorFactory::class, [
+				'configFiles' => $config['configs'] ?? []
+			]);
+
+		if (($config['overrideDefaultExtensions'] ?? false) !== true) {
+			$def->addSetup('disableDefaultExtensionsOverride');
+		}
 	}
 
 
