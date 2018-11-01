@@ -63,7 +63,7 @@ class TestCaseRunner
 			throw new TestCaseException("Method {$method->getName()} is not public. Make it public or rename it.");
 		}
 
-		$info = \Tester\Helpers::parseDocComment($method->getDocComment()) + ['dataprovider' => NULL];
+		$info = \Tester\Helpers::parseDocComment($method->getDocComment() ?? '') + ['dataprovider' => NULL];
 
 		$data = [];
 		$defaultParams = [];
