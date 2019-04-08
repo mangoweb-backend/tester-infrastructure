@@ -60,7 +60,7 @@ class TestCase
 	{
 		$hooks = [];
 		$hooks[] = static::getContainerHook($testContainer);
-		$doc = $rm->getDocComment();
+		$doc = $rm->getDocComment() ?: '';
 		$hookNames = Strings::matchAll($doc, '~\*\s+@hook\s+([\w_\\\\]+)(?:\s+.*)?$~m', PREG_PATTERN_ORDER);
 		foreach ($hookNames[1] as $hookName) {
 			if (class_exists($hookName)) {

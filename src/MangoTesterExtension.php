@@ -37,20 +37,18 @@ class MangoTesterExtension extends CompilerExtension
 		$this->registerHooks($config['hooks']);
 		$this->registerAppConfiguratorFactory($config['appContainer']);
 
-		$builder = $this->getContainerBuilder();
-		$builder->addDefinition($this->prefix('appContainer'))
+		$this->addDynamic($this->prefix('appContainer'))
 			->setClass(Container::class)
-			->setAutowired(false)
-			->setDynamic(true);
+			->setAutowired(false);
 
+		$builder = $this->getContainerBuilder();
 		$builder->addDefinition($this->prefix('containerFactory'))
 			->setClass(AppContainerFactory::class);
 
 		$builder->addDefinition($this->prefix('methodArgumentResolver'))
 			->setClass(MethodArgumentsResolver::class);
-		$builder->addDefinition($this->prefix('testContext'))
-			->setClass(TestContext::class)
-			->setDynamic(true);
+		$this->addDynamic($this->prefix('testContext'))
+			->setClass(TestContext::class);
 
 		if ($config['mockery'] !== false) {
 			$builder->addDefinition($this->prefix('mockeryContainerHook'))
@@ -65,7 +63,6 @@ class MangoTesterExtension extends CompilerExtension
 		$builder = $this->getContainerBuilder();
 		foreach ($builder->findByTag(self::TAG_REQUIRE) as $service => $attrs) {
 			$def = $builder->getDefinition($service);
-			$def->setDynamic(false);
 			if (is_string($attrs) && strpos($attrs, '\\') === false) {
 				$def->setFactory(new Statement([$this->prefix('@appContainer'), 'getService'], [$attrs]));
 			} elseif (is_string($attrs)) {
@@ -106,7 +103,6 @@ class MangoTesterExtension extends CompilerExtension
 		$name = preg_replace('#\W+#', '_', $class);
 		$builder->addDefinition($this->prefix($name))
 			->setClass($class)
-			->setDynamic(true)
 			->addTag(self::TAG_REQUIRE);
 	}
 
@@ -136,4 +132,19 @@ class MangoTesterExtension extends CompilerExtension
 			->addParameter('container');
 	}
 
+
+	/**
+	 * @return Nette\DI\Definitions\ImportedDefinition|Nette\DI\ServiceDefinition
+	 */
+	private function addDynamic(string $name)
+	{
+		$builder = $this->getContainerBuilder();
+		if (class_exists(Nette\DI\Definitions\ImportedDefinition::class)) {
+			return $builder->addImportedDefinition($name);
+		}
+		$def = $builder->addDefinition($name);
+		$def->setDynamic(true);
+
+		return $def;
+	}
 }
