@@ -4,6 +4,7 @@ namespace Mangoweb\Tester\Infrastructure;
 
 use Nette\DI\Container;
 use Nette\DI\Helpers;
+use Nette\DI\Resolver;
 use Nette\Utils\Strings;
 
 
@@ -14,7 +15,7 @@ class MethodArgumentsResolver
 	{
 		$fixedArgs = $this->prepareArguments($method, $appContainer);
 
-		return Helpers::autowireArguments($method, $args + $fixedArgs, $appContainer);
+		return Resolver::autowireArguments($method, $args + $fixedArgs, $appContainer);
 	}
 
 
@@ -32,7 +33,7 @@ class MethodArgumentsResolver
 	 */
 	protected function prepareArguments(\ReflectionMethod $method, Container $appContainer): array
 	{
-		$doc = $method->getDocComment();
+		$doc = $method->getDocComment() ?: '';
 
 		$parameters = $appContainer->getParameters();
 		$paramAnnotations = Strings::matchAll($doc, '~@param\s+(?P<name>\$\S+)\s+(?P<value>.*?)\s*$~m');

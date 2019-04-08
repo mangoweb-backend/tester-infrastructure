@@ -38,19 +38,19 @@ class MangoTesterExtension extends CompilerExtension
 		$this->registerAppConfiguratorFactory($config['appContainer']);
 
 		$builder = $this->getContainerBuilder();
-		$builder->addDefinition($this->prefix('appContainer'))
-			->setClass(Container::class)
-			->setAutowired(false)
-			->setDynamic(true);
+
+		$builder->addImportedDefinition($this->prefix('appContainer'))
+			->setType(Container::class)
+			->setAutowired(false);
 
 		$builder->addDefinition($this->prefix('containerFactory'))
 			->setClass(AppContainerFactory::class);
 
 		$builder->addDefinition($this->prefix('methodArgumentResolver'))
 			->setClass(MethodArgumentsResolver::class);
-		$builder->addDefinition($this->prefix('testContext'))
-			->setClass(TestContext::class)
-			->setDynamic(true);
+
+		$builder->addImportedDefinition($this->prefix('testContext'))
+			->setType(TestContext::class);
 
 		if ($config['mockery'] !== false) {
 			$builder->addDefinition($this->prefix('mockeryContainerHook'))
@@ -65,7 +65,6 @@ class MangoTesterExtension extends CompilerExtension
 		$builder = $this->getContainerBuilder();
 		foreach ($builder->findByTag(self::TAG_REQUIRE) as $service => $attrs) {
 			$def = $builder->getDefinition($service);
-			$def->setDynamic(false);
 			if (is_string($attrs) && strpos($attrs, '\\') === false) {
 				$def->setFactory(new Statement([$this->prefix('@appContainer'), 'getService'], [$attrs]));
 			} elseif (is_string($attrs)) {
@@ -106,7 +105,6 @@ class MangoTesterExtension extends CompilerExtension
 		$name = preg_replace('#\W+#', '_', $class);
 		$builder->addDefinition($this->prefix($name))
 			->setClass($class)
-			->setDynamic(true)
 			->addTag(self::TAG_REQUIRE);
 	}
 
@@ -135,5 +133,4 @@ class MangoTesterExtension extends CompilerExtension
 			->setBody('$this->addService(?, $container);', [$this->prefix('appContainer')])
 			->addParameter('container');
 	}
-
 }
