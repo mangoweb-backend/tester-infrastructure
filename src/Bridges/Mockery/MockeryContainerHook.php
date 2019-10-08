@@ -25,7 +25,7 @@ class MockeryContainerHook extends AppContainerHook
 	{
 		$rc = new \ReflectionClass($this->testContext->getTestCaseClass());
 		$rm = $rc->getMethod($this->testContext->getTestMethod());
-		$doc = $rm->getDocComment();
+		$doc = $rm->getDocComment() ?: '';
 		$params = Strings::matchAll($doc, '~\*\s+@param\s+([\w_\\\\|]+)\s+(\$[\w_]+)(?:\s+.*)?$~Um');
 		foreach ($params as [, $types, $paramName]) {
 			$types = explode('|', $types);
