@@ -15,7 +15,13 @@ class MethodArgumentsResolver
 	{
 		$fixedArgs = $this->prepareArguments($method, $appContainer);
 
-		return Resolver::autowireArguments($method, $args + $fixedArgs, $appContainer);
+		$getter = function (string $type, bool $single) use ($appContainer) {
+			return $single
+				? $appContainer->getByType($type)
+				: array_map([$appContainer, 'getService'], $appContainer->findAutowired($type));
+		};
+
+		return Resolver::autowireArguments($method, $args + $fixedArgs, $getter);
 	}
 
 
