@@ -6,6 +6,7 @@ use Nette\DI\Container;
 use Nette\DI\Helpers;
 use Nette\DI\Resolver;
 use Nette\Utils\Strings;
+use ReflectionClass;
 
 
 class MethodArgumentsResolver
@@ -15,13 +16,20 @@ class MethodArgumentsResolver
 	{
 		$fixedArgs = $this->prepareArguments($method, $appContainer);
 
-		$getter = function (string $type, bool $single) use ($appContainer) {
-			return $single
-				? $appContainer->getByType($type)
-				: array_map([$appContainer, 'getService'], $appContainer->findAutowired($type));
-		};
+		$ref = new ReflectionClass(Resolver::class);
+		$params = $ref->getMethod('autowireArguments')->getParameters();
 
-		return Resolver::autowireArguments($method, $args + $fixedArgs, $getter);
+		if ($params[2]->name == 'resolver') {
+			return Resolver::autowireArguments($method, $args + $fixedArgs, $appContainer);
+		} elseif ($params[2]->name == 'getter') {
+			$getter = function (string $type, bool $single) use ($appContainer) {
+				return $single
+					? $appContainer->getByType($type)
+					: array_map([$appContainer, 'getService'], $appContainer->findAutowired($type));
+			};
+
+			return Resolver::autowireArguments($method, $args + $fixedArgs, $getter);
+		}
 	}
 
 
