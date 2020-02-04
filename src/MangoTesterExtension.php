@@ -7,6 +7,7 @@ use Mangoweb\Tester\Infrastructure\Container\AppContainerFactory;
 use Nette;
 use Nette\DI\CompilerExtension;
 use Nette\DI\Container;
+use Nette\DI\Definitions\ServiceDefinition;
 use Nette\DI\Statement;
 
 
@@ -64,6 +65,7 @@ class MangoTesterExtension extends CompilerExtension
 	{
 		$builder = $this->getContainerBuilder();
 		foreach ($builder->findByTag(self::TAG_REQUIRE) as $service => $attrs) {
+			/** @var ServiceDefinition $def */
 			$def = $builder->getDefinition($service);
 			if (is_string($attrs) && strpos($attrs, '\\') === false) {
 				$def->setFactory(new Statement([$this->prefix('@appContainer'), 'getService'], [$attrs]));
