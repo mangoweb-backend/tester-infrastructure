@@ -11,13 +11,13 @@ env:
   extensions: "json"
 
 jobs:
-  static-analysis:
+  tests:
     name: "Static analysis"
     runs-on: "${{ matrix.operating-system }}"
 
     strategy:
       matrix:
-        php-version: ["7.4"]
+        php-version: ["7.2", "7.4", "8.0"]
         operating-system: ["ubuntu-latest"]
       fail-fast: false
 
@@ -66,3 +66,6 @@ jobs:
 
       - name: "PHPStan"
         run: "vendor/bin/phpstan analyse --configuration phpstan.neon --level 7 src/"
+
+      - name: "Tester"
+        run: "vendor/bin/tester tests/cases"
