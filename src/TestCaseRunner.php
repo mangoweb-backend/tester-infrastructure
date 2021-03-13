@@ -38,6 +38,7 @@ class TestCaseRunner
 		$methods = array_values($methods);
 
 		if (isset($_SERVER['argv']) && ($tmp = preg_filter('#--method=([\w-]+)$#Ai', '$1', $_SERVER['argv']))) {
+			assert(is_array($tmp));
 			$method = reset($tmp);
 			if ($method === self::LIST_METHODS) {
 				Environment::$checkAssertions = FALSE;

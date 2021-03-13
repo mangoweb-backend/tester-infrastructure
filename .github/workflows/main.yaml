@@ -67,11 +67,18 @@ jobs:
       - name: "PHPStan"
         run: "vendor/bin/phpstan analyse --configuration phpstan.neon --level 7 src/"
 
+      - name: "Run single test"
+        run: "php tests/cases/TestRunTest.phpt"
+
       - name: "Tester"
         run: "vendor/bin/tester tests/cases"
 
       - name: "Install lowest dependencies"
         run: "${{ env.composer-install }} --prefer-lowest"
+
+
+      - name: "Run single test"
+        run: "php tests/cases/TestRunTest.phpt"
 
       - name: "Tester on lowest"
         run: "vendor/bin/tester tests/cases"

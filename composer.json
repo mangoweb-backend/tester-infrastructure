@@ -4,7 +4,7 @@
 	"require": {
 		"php": ">=7.1",
 		"nette/di": "~2.4.17 || ~3.0",
-		"nette/tester": "~2.0"
+		"nette/tester": "~2.3.1"
 	},
 	"require-dev": {
 		"nette/utils": "~2.5.7 || ~3.0",
