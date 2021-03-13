@@ -2,7 +2,7 @@
 	"name": "mangoweb/tester-infrastructure",
 	"license": "MIT",
 	"require": {
-		"php": "~7.1",
+		"php": ">=7.1",
 		"nette/di": "~2.4 || ~3.0",
 		"nette/bootstrap": "~2.4 || ~3.0",
 		"nette/tester": "~2.0"
