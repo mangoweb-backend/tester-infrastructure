@@ -15,10 +15,13 @@ class TestCaseRunner
 	/** @var callable */
 	private $testContainerFactory;
 
-	/** @var string */
+	/** @var class-string */
 	private $testCaseClass;
 
 
+	/**
+	 * @param class-string $testCaseClass
+	 */
 	public function __construct(string $testCaseClass, callable $testContainerFactory)
 	{
 		$this->testContainerFactory = $testContainerFactory;
@@ -28,9 +31,11 @@ class TestCaseRunner
 
 	public function run(): void
 	{
-		$methods = array_values(preg_grep(self::METHOD_PATTERN, array_map(function (\ReflectionMethod $rm) {
+		$methods = preg_grep(self::METHOD_PATTERN, array_map(function (\ReflectionMethod $rm) {
 			return $rm->getName();
-		}, (new \ReflectionClass($this->testCaseClass))->getMethods())));
+		}, (new \ReflectionClass($this->testCaseClass))->getMethods()));
+		assert($methods !== false);
+		$methods = array_values($methods);
 
 		if (isset($_SERVER['argv']) && ($tmp = preg_filter('#--method=([\w-]+)$#Ai', '$1', $_SERVER['argv']))) {
 			$method = reset($tmp);
@@ -80,9 +85,6 @@ class TestCaseRunner
 
 		foreach ((array) $info['dataprovider'] as $provider) {
 			$res = self::getData($provider);
-			if (!is_array($res) && !$res instanceof \Traversable) {
-				throw new TestCaseException("Data provider $provider() doesn't return array or Traversable.");
-			}
 			foreach ($res as $set) {
 				$data[] = is_string(key($set)) ? array_merge($defaultParams, $set) : $set;
 			}
@@ -97,19 +99,28 @@ class TestCaseRunner
 	}
 
 
+	/**
+	 * @param mixed[] $args
+	 * @return mixed
+	 */
 	private function callTestMethod(string $method, array $args)
 	{
 		return ($this->testCaseClass)::runMethod($this->testContainerFactory, $method, $args);
 	}
 
 
-	protected function getData($provider): iterable
+	/**
+	 * @return iterable<mixed>
+	 */
+	protected function getData(string $provider): iterable
 	{
 		if (strpos($provider, '.') === FALSE) {
 			return $this->callTestMethod($provider, []);
 		}
 		$rc = new \ReflectionClass($this->testCaseClass);
-		[$file, $query] = DataProvider::parseAnnotation($provider, $rc->getFileName());
+		$fileName = $rc->getFileName();
+		assert($fileName !== false);
+		[$file, $query] = DataProvider::parseAnnotation($provider, $fileName);
 		return DataProvider::load($file, $query);
 	}
 

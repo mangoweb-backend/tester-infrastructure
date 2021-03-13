@@ -18,16 +18,20 @@ class DefaultAppConfiguratorFactory implements IAppConfiguratorFactory
 		'consoleMode',
 	];
 
-	/** @var array */
+	/** @var string[] */
 	private $configFiles;
 
-	/** @var array */
+	/** @var string[] */
 	private $copiedParameters;
 
 	/** @var bool */
 	private $defaultExtensionsOverride = true;
 
 
+	/**
+	 * @param string[]          $configFiles
+	 * @param string[] $copiedParameters
+	 */
 	public function __construct(array $configFiles, array $copiedParameters = self::COPIED_PARAMETERS)
 	{
 		$this->configFiles = $configFiles;

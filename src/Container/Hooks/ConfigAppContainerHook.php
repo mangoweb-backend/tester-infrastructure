@@ -9,12 +9,12 @@ use Nette\DI\ContainerBuilder;
 
 class ConfigAppContainerHook implements IAppContainerHook
 {
-	/** @var array|string */
+	/** @var array<mixed>|string */
 	private $config;
 
 
 	/**
-	 * @param array|string $config
+	 * @param array<mixed>|string $config
 	 */
 	public function __construct($config)
 	{

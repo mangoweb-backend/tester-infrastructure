@@ -34,6 +34,10 @@ class TestCase
 	}
 
 
+	/**
+	 * @param mixed[] $args
+	 * @return mixed
+	 */
 	public static function runMethod(callable $testContainerFactory, string $method, array $args)
 	{
 		$testContainer = $testContainerFactory();
@@ -56,7 +60,7 @@ class TestCase
 	}
 
 
-	protected static function createApplicationContainer(Container $testContainer, \ReflectionMethod $rm)
+	protected static function createApplicationContainer(Container $testContainer, \ReflectionMethod $rm): Container
 	{
 		$hooks = [];
 		$hooks[] = static::getContainerHook($testContainer);
@@ -128,6 +132,10 @@ class TestCase
 	}
 
 
+	/**
+	 * @param mixed[] $args
+	 * @return mixed
+	 */
 	protected function execute(\ReflectionMethod $method, array $args)
 	{
 		if ($this->prevErrorHandler === FALSE) {
@@ -173,7 +181,8 @@ class TestCase
 
 	private function silentTearDown(): void
 	{
-		set_error_handler(function () {
+		set_error_handler(function (): bool {
+			return true;
 		});
 		try {
 			$this->tearDown();
@@ -183,6 +192,10 @@ class TestCase
 	}
 
 
+	/**
+	 * @param mixed[] $args
+	 * @return mixed
+	 */
 	protected function invoke(\ReflectionMethod $method, array $args)
 	{
 		if (count($method->getParameters()) > 0) {
@@ -191,7 +204,9 @@ class TestCase
 			$args = $resolver->resolve($method, $this->applicationContainer, $args);
 		}
 
-		return call_user_func_array([$this, $method->getName()], $args);
+		$callback = [$this, $method->getName()];
+		assert(is_callable($callback));
+		return call_user_func_array($callback, $args);
 	}
 
 }

@@ -5,13 +5,16 @@ namespace Mangoweb\Tester\Infrastructure;
 
 class TestContext
 {
-	/** @var string */
+	/** @var class-string */
 	private $testCaseClass;
 
 	/** @var string */
 	private $testMethod;
 
 
+	/**
+	 * @param class-string $testCaseClass
+	 */
 	public function __construct(string $testCaseClass, string $testMethod)
 	{
 		$this->testCaseClass = $testCaseClass;
@@ -19,6 +22,9 @@ class TestContext
 	}
 
 
+	/**
+	 * @return class-string
+	 */
 	public function getTestCaseClass(): string
 	{
 		return $this->testCaseClass;

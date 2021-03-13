@@ -8,10 +8,10 @@ use Nette\DI;
 
 class InfrastructureConfigurator
 {
-	/** @var array */
+	/** @var mixed[] */
 	protected $parameters;
 
-	/** @var array */
+	/** @var array<string|mixed[]> */
 	protected $configs = [];
 
 
@@ -42,6 +42,9 @@ class InfrastructureConfigurator
 	}
 
 
+	/**
+	 * @param mixed[] $params
+	 */
 	public function addParameters(array $params): void
 	{
 		$parameters = DI\Config\Helpers::merge($params, $this->parameters);
@@ -52,7 +55,7 @@ class InfrastructureConfigurator
 
 
 	/**
-	 * @param array|string $config file or configuration itself
+	 * @param mixed[]|string $config file or configuration itself
 	 */
 	public function addConfig($config): void
 	{

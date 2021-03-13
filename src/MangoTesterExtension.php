@@ -16,6 +16,7 @@ class MangoTesterExtension extends CompilerExtension
 	public const TAG_REQUIRE = 'mango.tester.require';
 	public const TAG_HOOK = 'mango.tester.hook';
 
+	/** @var mixed[]  */
 	public $defaults = [
 		'hooks' => [],
 		'require' => [],
@@ -77,6 +78,9 @@ class MangoTesterExtension extends CompilerExtension
 	}
 
 
+	/**
+	 * @param class-string[] $hooks
+	 */
 	protected function registerHooks(array $hooks): void
 	{
 		$builder = $this->getContainerBuilder();
@@ -91,6 +95,9 @@ class MangoTesterExtension extends CompilerExtension
 	}
 
 
+	/**
+	 * @param string[] $requiredServices
+	 */
 	protected function registerRequiredServices(array $requiredServices): void
 	{
 		foreach ($requiredServices as $class) {
@@ -99,7 +106,7 @@ class MangoTesterExtension extends CompilerExtension
 	}
 
 
-	private function requireService(string $class)
+	private function requireService(string $class): void
 	{
 		$builder = $this->getContainerBuilder();
 		$name = preg_replace('#\W+#', '_', $class);
@@ -109,7 +116,10 @@ class MangoTesterExtension extends CompilerExtension
 	}
 
 
-	private function registerAppConfiguratorFactory(array $config)
+	/**
+	 * @param mixed[] $config
+	 */
+	private function registerAppConfiguratorFactory(array $config): void
 	{
 		if ($config === []) {
 			return;

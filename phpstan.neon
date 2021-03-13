@@ -1,6 +1,10 @@
 parameters:
+	treatPhpDocTypesAsCertain: false
 	ignoreErrors:
 		- '#Call to an undefined method Nette\\DI\\Container::setAppContainer\(\)#'
 		-
 			path: src/MethodArgumentsResolver.php
-			message: '#.*(Resolver|autowire).*#'
+			message: '#.*(Resolver|autowire|findAutowired).*#'
+		-
+			path: src/MangoTesterExtension.php
+			message: '#.+(unknown class Nette\\DI\\Definitions|ImportedDefinition|setDynamic).+#'

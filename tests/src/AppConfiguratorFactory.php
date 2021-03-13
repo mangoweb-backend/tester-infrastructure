@@ -12,6 +12,11 @@ class AppConfiguratorFactory implements IAppConfiguratorFactory
 	{
 		$configurator = new Configurator();
 		$configurator->setTempDirectory($testContainer->getParameters()['tempDir']);
+		$configurator->addConfig([
+			'services' => [
+				\DateTimeImmutable::class,
+			],
+		]);
 
 		return $configurator;
 	}
