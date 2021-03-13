@@ -16,6 +16,10 @@ class MethodArgumentsResolver
 	{
 		$fixedArgs = $this->prepareArguments($method, $appContainer);
 
+		if (method_exists(Helpers::class, 'autowireArguments')) {
+			return Helpers::autowireArguments($method, $args + $fixedArgs, $appContainer);
+		}
+
 		$ref = new ReflectionClass(Resolver::class);
 		$params = $ref->getMethod('autowireArguments')->getParameters();
 
@@ -29,6 +33,8 @@ class MethodArgumentsResolver
 			};
 
 			return Resolver::autowireArguments($method, $args + $fixedArgs, $getter);
+		} else {
+			throw new \LogicException();
 		}
 	}
 

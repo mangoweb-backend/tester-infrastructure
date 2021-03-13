@@ -13,6 +13,7 @@ class Bootstrap
 	{
 		$configurator = new Configurator();
 		$configurator->setTempDirectory(__DIR__ . '/../temp');
+		$configurator->setDebugMode(true);
 		$configurator->enableDebugger(__DIR__ . '/../temp');
 		$configurator->addConfig([
 			'extensions' => [

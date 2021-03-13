@@ -40,8 +40,7 @@ class MangoTesterExtension extends CompilerExtension
 
 		$builder = $this->getContainerBuilder();
 
-		$builder->addImportedDefinition($this->prefix('appContainer'))
-			->setType(Container::class)
+		$this->addDynamic($this->prefix('appContainer'), Container::class)
 			->setAutowired(false);
 
 		$builder->addDefinition($this->prefix('containerFactory'))
@@ -50,8 +49,7 @@ class MangoTesterExtension extends CompilerExtension
 		$builder->addDefinition($this->prefix('methodArgumentResolver'))
 			->setClass(MethodArgumentsResolver::class);
 
-		$builder->addImportedDefinition($this->prefix('testContext'))
-			->setType(TestContext::class);
+		$this->addDynamic($this->prefix('testContext'), TestContext::class);
 
 		if ($config['mockery'] !== false) {
 			$builder->addDefinition($this->prefix('mockeryContainerHook'))
@@ -134,5 +132,22 @@ class MangoTesterExtension extends CompilerExtension
 		$class->addMethod('setAppContainer')
 			->setBody('$this->addService(?, $container);', [$this->prefix('appContainer')])
 			->addParameter('container');
+	}
+
+
+	/**
+	 * @return Nette\DI\Definitions\ImportedDefinition|Nette\DI\ServiceDefinition
+	 */
+	private function addDynamic(string $name, string $className)
+	{
+		$builder = $this->getContainerBuilder();
+		if (class_exists(Nette\DI\Definitions\ImportedDefinition::class)) {
+			return $builder->addImportedDefinition($name)->setType($className);
+		}
+		$def = $builder->addDefinition($name);
+		$def->setClass($className);
+		$def->setDynamic(true);
+
+		return $def;
 	}
 }
