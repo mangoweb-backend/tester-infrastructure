@@ -37,7 +37,14 @@ class TestCaseRunner
 			if ($method === self::LIST_METHODS) {
 				Environment::$checkAssertions = FALSE;
 				header('Content-Type: text/plain');
-				echo '[' . implode(',', $methods) . ']';
+				if (method_exists(\Tester\TestCase::class, 'sendMethodList')) {
+					echo "\n";
+					echo 'TestCase:' . static::class . "\n";
+					echo 'Method:' . implode("\nMethod:", $methods) . "\n";
+				} else {
+					// legacy format
+					echo '[' . implode(',', $methods) . ']';
+				}
 				return;
 			}
 			$this->runMethod($method);
